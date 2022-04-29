@@ -1,22 +1,57 @@
+#top {
+    height: 20vh;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+#center {
+    height: 60vh;
+    display: flex;
+    justify-content: space-between;
+}
+
+#fake-player-left {
+    display: flex;
+    width: 13vw;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#play-state {
+    width: 60vw;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#fake-player-right {
+    display: flex;
+    width: 13vw;
+    flex-flow: column-reverse nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+#bottom {
+    height: 20vh;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
 .card {
-    width: 15em;
-    height: 20em;
-    margin: 3em;
+    max-height: 13em;
+    margin: 0.5em;
 
     border-radius: 5%;
     box-shadow: 0.1em 0.1em 0.5em gray;
-
-    background-image: url("images/ocean.jpg");
-    background-repeat: no-repeat;
-    object-fit: cover;
-    background-position: center;
-    background-size: cover;
 }
 
-.container {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.rotated {
+    max-width: 13em;
+    max-height: auto;
 }

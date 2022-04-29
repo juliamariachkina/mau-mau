@@ -8,9 +8,41 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="card" id="card0"></div>
-        <div class="card" id="card1"></div>
+    <div id="playboard">
+        <div id="top">
+            <div id="fake-player-top">
+                <img class="card" src="images/card-back.png">
+                <img class="card" src="images/card-back.png">
+                <img class="card" src="images/card-back.png">
+                <img class="card" src="images/card-back.png">
+            </div>
+        </div>
+        <div id="center">
+            <div id="fake-player-left">
+                <img class="card rotated" src="images/card-back-rotated.png">
+                <img class="card rotated" src="images/card-back-rotated.png">
+                <img class="card rotated" src="images/card-back-rotated.png">
+                <img class="card rotated" src="images/card-back-rotated.png">
+            </div>
+            <div id="play-state">
+                <img class="card" src="images/card-back.png">
+                <img class="card" src="images/8_of_clubs.png">
+            </div>
+            <div id="fake-player-right">
+                <img class="card rotated" src="images/card-back-rotated.png">
+                <img class="card rotated" src="images/card-back-rotated.png">
+                <img class="card rotated" src="images/card-back-rotated.png">
+                <img class="card rotated" src="images/card-back-rotated.png">
+            </div>
+        </div>
+        <div id="bottom">
+            <div id="real-player">
+                <img class="card" src="images/7_of_clubs.png">
+                <img class="card" src="images/8_of_clubs.png">
+                <img class="card" src="images/9_of_clubs.png">
+                <img class="card" src="images/10_of_clubs.png">
+            </div>
+        </div>
     </div>
     <script src="main.js"></script>
 </body>
