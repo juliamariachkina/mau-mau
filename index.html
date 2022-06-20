@@ -8,43 +8,40 @@
 </head>
 
 <body>
-    <div id="playboard">
-        <div id="top">
-            <div id="fake-player-top">
-                <img class="card" src="images/card-back.png">
-                <img class="card" src="images/card-back.png">
-                <img class="card" src="images/card-back.png">
-                <img class="card" src="images/card-back.png">
-            </div>
+    <div class="playboard">
+        <div class="top">
+            <div class="artificial-top"></div>
         </div>
-        <div id="center">
-            <div id="fake-player-left">
-                <img class="card rotated" src="images/card-back-rotated.png">
-                <img class="card rotated" src="images/card-back-rotated.png">
-                <img class="card rotated" src="images/card-back-rotated.png">
-                <img class="card rotated" src="images/card-back-rotated.png">
+        <div class="center">
+            <div class="artificial-left"></div>
+            <div class="play-state">
+                <div class="play-state-cards">
+                    <img class="card stock" src="images/card-back.png">
+                    <img class="card discard-pile" src="images/card-back.png">
+                </div>
+                <ul class="user-guide">
+                    <li>Active suit: <img class="active-suit"></li>
+                    <li class="active-player"></li>
+                    <li class="next-draw-amount"></li>
+                </ul>
             </div>
-            <div id="play-state">
-                <img class="card" src="images/card-back.png">
-                <img class="card" src="images/8_of_clubs.png">
-            </div>
-            <div id="fake-player-right">
-                <img class="card rotated" src="images/card-back-rotated.png">
-                <img class="card rotated" src="images/card-back-rotated.png">
-                <img class="card rotated" src="images/card-back-rotated.png">
-                <img class="card rotated" src="images/card-back-rotated.png">
-            </div>
+            <div class="artificial-right"></div>
         </div>
-        <div id="bottom">
-            <div id="real-player">
-                <img class="card" src="images/7_of_clubs.png">
-                <img class="card" src="images/8_of_clubs.png">
-                <img class="card" src="images/9_of_clubs.png">
-                <img class="card" src="images/10_of_clubs.png">
+        <div class="bottom">
+            <div>
+                <button type="button" class="button">Skip turn</button>
+            </div>
+            <div class="real"></div>
+        </div>
+        <div class="modal">
+            <div class="modal__content">
+                <div class="modal__close-btn">
+                    <span class="close-btn">&times;</span>
+                </div>
             </div>
         </div>
     </div>
-    <script src="main.js"></script>
+    <script src="./build/main.js"></script>
 </body>
 
 </html>
