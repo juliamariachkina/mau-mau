@@ -1,0 +1,26 @@
+{
+  "name": "mau-mau",
+  "version": "1.0.0",
+  "description": "Mau-mau card game (Czech variant)",
+  "main": "main.js",
+  "scripts": {
+    "compile": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juliamariachkina/mau-mau.git"
+  },
+  "keywords": [
+    "mau-mau"
+  ],
+  "author": "Julia Mariachkina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juliamariachkina/mau-mau/issues"
+  },
+  "homepage": "https://github.com/juliamariachkina/mau-mau#readme",
+  "dependencies": {
+    "typescript": "^4.7.2"
+  }
+}
