@@ -12,7 +12,7 @@
     justify-content: space-between;
 }
 
-.artificial-left {
+.artificial-player-left {
     display: flex;
     width: 13vw;
     flex-flow: column nowrap;
@@ -45,7 +45,7 @@ ul.user-guide {
     max-height: 1.5em;
 }
 
-.artificial-right {
+.artificial-player-right {
     display: flex;
     width: 13vw;
     flex-flow: column-reverse nowrap;
@@ -53,11 +53,11 @@ ul.user-guide {
     align-items: center;
 }
 
-.artificial-top {
+.artificial-player-top {
     display: flex;
 }
 
-.real {
+.real-player {
     display: flex;
     max-height: 100%;
     max-width: 100%;
