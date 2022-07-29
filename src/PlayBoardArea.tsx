@@ -1,5 +1,5 @@
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 
-export function PlayBoardArea(props: { position: string, children: ReactElement | ReactElement[] }) {
+export function PlayBoardArea(props: { position: string, children: ReactNode }) {
     return <div className={props.position}>{props.children}</div>;
 }

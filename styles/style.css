@@ -74,6 +74,7 @@ ul.user-guide {
 
 .card {
     max-height: 13em;
+    max-width: 13em;
     min-width: 0;
     margin: 0.5em;
 
@@ -106,7 +107,7 @@ ul.user-guide {
     background-color: darkblue;
     font-family: sans-serif;
     padding: 1em 1.5em;
-    display: none;
+    display: block;
 }
 
 .close-btn {

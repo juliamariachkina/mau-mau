@@ -1,22 +1,30 @@
 import { MouseEventHandler, useState } from 'react';
 import { Card } from './Card';
 import { Card as CardType } from './types/card';
+import { getImageSrc } from './Utility';
 
-export function Player(props: { isReal: boolean, position: string }) {
-    const [cards, setCards] = useState<CardType[]>([]);
-    if (cards.length === 0) {
-        return null;
-    }
+import cardBack from "../images/card-back.png";
+import cardBackRotated from "../images/card-back-rotated.png";
+
+export function Player(props: { isReal: boolean, position: string, cards: CardType[], onCardClick: MouseEventHandler<HTMLImageElement> }) {
     const className = props.isReal
         ? "real-player"
         : "artificial-player-" + props.position;
-    const handleCardClick: MouseEventHandler<HTMLImageElement> = (e) => {
-        const targetSrc = (e.target as HTMLImageElement).getAttribute('src');
-        setCards(cards.filter(card => !targetSrc?.includes(card.suit + card.rank)));
-    }
+    const cardClassName = props.position === "top"
+        ? "card rotated"
+        : "card";
     return (
         <div className={className}>
-            {cards.map((playerCard, i) => (<Card key={i} card={playerCard} />))}
+            {props.cards.map((playerCard, i) =>
+            (<Card
+                key={i}
+                src={props.isReal
+                    ? getImageSrc(playerCard)
+                    : (props.position === "top"
+                        ? cardBack
+                        : cardBackRotated)}
+                className={cardClassName}
+                onClick={props.onCardClick} />))}
         </div>
     );
 }
