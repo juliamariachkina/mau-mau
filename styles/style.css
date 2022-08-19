@@ -89,7 +89,7 @@ ul.user-guide {
 }
 
 .modal {
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
 
@@ -170,4 +170,9 @@ ul.user-guide {
     box-shadow: 0.05em 0.05em 0.3em #94762a;
 
     color: #826943;
+}
+
+.modal__content__suit-img {
+    max-height: 4em;
+    margin: 0.3em;
 }
