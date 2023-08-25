@@ -1,4 +1,4 @@
-import { Card, Suit } from "./types/card";
+import { Card, Suit } from "../types/card";
 
 import cardBack from "../images/card-back.png";
 import club from "../images/club.png";
@@ -39,51 +39,87 @@ import heartK from "../images/heartK.png";
 import heartQ from "../images/heartQ.png";
 
 export function getImageSrc(card: Card | undefined) {
-    if (card === undefined) {
-        return cardBack;
-    }
-    switch (card.suit + card.rank) {
-        case "spade7": return spade7;
-        case "spade8": return spade8;
-        case "spade9": return spade9;
-        case "spade10": return spade10;
-        case "spadeJ": return spadeJ;
-        case "spadeQ": return spadeQ;
-        case "spadeK": return spadeK;
-        case "spadeA": return spadeA;
-        case "club7": return club7;
-        case "club8": return club8;
-        case "club9": return club9;
-        case "club10": return club10;
-        case "clubJ": return clubJ;
-        case "clubQ": return clubQ;
-        case "clubK": return clubK;
-        case "clubA": return clubA;
-        case "heart7": return heart7;
-        case "heart8": return heart8;
-        case "heart9": return heart9;
-        case "heart10": return heart10;
-        case "heartJ": return heartJ;
-        case "heartQ": return heartQ;
-        case "heartK": return heartK;
-        case "heartA": return heartA;
-        case "diamond7": return diamond7;
-        case "diamond8": return diamond8;
-        case "diamond9": return diamond9;
-        case "diamond10": return diamond10;
-        case "diamondJ": return diamondJ;
-        case "diamondQ": return diamondQ;
-        case "diamondK": return diamondK;
-        case "diamondA": return diamondA;
-    }
+  if (card === undefined) {
     return cardBack;
+  }
+  switch (card.suit + card.rank) {
+    case "spade7":
+      return spade7;
+    case "spade8":
+      return spade8;
+    case "spade9":
+      return spade9;
+    case "spade10":
+      return spade10;
+    case "spadeJ":
+      return spadeJ;
+    case "spadeQ":
+      return spadeQ;
+    case "spadeK":
+      return spadeK;
+    case "spadeA":
+      return spadeA;
+    case "club7":
+      return club7;
+    case "club8":
+      return club8;
+    case "club9":
+      return club9;
+    case "club10":
+      return club10;
+    case "clubJ":
+      return clubJ;
+    case "clubQ":
+      return clubQ;
+    case "clubK":
+      return clubK;
+    case "clubA":
+      return clubA;
+    case "heart7":
+      return heart7;
+    case "heart8":
+      return heart8;
+    case "heart9":
+      return heart9;
+    case "heart10":
+      return heart10;
+    case "heartJ":
+      return heartJ;
+    case "heartQ":
+      return heartQ;
+    case "heartK":
+      return heartK;
+    case "heartA":
+      return heartA;
+    case "diamond7":
+      return diamond7;
+    case "diamond8":
+      return diamond8;
+    case "diamond9":
+      return diamond9;
+    case "diamond10":
+      return diamond10;
+    case "diamondJ":
+      return diamondJ;
+    case "diamondQ":
+      return diamondQ;
+    case "diamondK":
+      return diamondK;
+    case "diamondA":
+      return diamondA;
+  }
+  return cardBack;
 }
 
 export function getSuitImage(suit: Suit) {
-    switch (suit) {
-        case "club": return club;
-        case "spade": return spade;
-        case "heart": return heart;
-        case "diamond": return diamond;
-    }
+  switch (suit) {
+    case "club":
+      return club;
+    case "spade":
+      return spade;
+    case "heart":
+      return heart;
+    case "diamond":
+      return diamond;
+  }
 }
