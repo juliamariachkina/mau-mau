@@ -12,7 +12,7 @@ import { Modal, SuitChoiceModal } from "../ui/Modal";
 const PLAYER_TURN_TIMEOUT = 1200;
 const INIT_CARDS_COUNT_PER_PLAYER = 4;
 
-export function App(props: {}) {
+export const Game = (props: {}) => {
   const [stock, setStock] = useState<CardType[]>([]);
   const [discardPile, setDiscardPile] = useState<CardType[]>([]);
   const [players, setPlayers] = useState<PlayerType[]>([]);
