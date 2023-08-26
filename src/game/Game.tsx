@@ -4,217 +4,16 @@ import { PlayState } from "./PlayState";
 import { Button } from "../ui/Button";
 import { MouseEventHandler, useEffect, useState, useReducer } from "react";
 import { Card as CardType, deck, Suit, SUITS } from "../types/card";
-import { Player as PlayerType, Position } from "../types/player";
 import { getImageSrc } from "../utility/Utility";
-import { v4 as uuidv4 } from "uuid";
 import { Modal, SuitChoiceModal } from "../ui/Modal";
-import { Board } from "../types/board";
+import { playerReducer, playersInitialState } from "../reducers/player";
+import { canBePlayedOn, drawCards, getCurrentPlayer, getPlayerCards } from "../utility/GameUtility";
+import { boardInitialState, boardReducer } from "../reducers/board";
 
 const PLAYER_TURN_TIMEOUT = 1200;
-const INIT_CARDS_COUNT_PER_PLAYER = 4;
-
-const boardInitialState: Board = {
-  stock: [],
-  discardPile: [],
-  isCardEffectOn: false,
-  activeSuit: SUITS[0],
-  nextStockDrawCount: 1,
-};
-
-type BoardReducerAction =
-  | {
-      type: "INIT";
-      data: {
-        stock: CardType[];
-      };
-    }
-  | {
-      type: "SKIP_TURN";
-      data: {
-        stock: CardType[];
-        discardPile: CardType[];
-      };
-    }
-  | {
-      type: "DRAW";
-      data: {
-        stock: CardType[];
-        discardPile: CardType[];
-      };
-    }
-  | {
-      type: "PLAY";
-      data: {
-        selectedCard: CardType;
-        newSuit?: Suit;
-      };
-    };
-
-const boardReducer = (
-  state: Board,
-  { type, data }: BoardReducerAction
-): Board => {
-  switch (type) {
-    case "INIT": {
-      const shuffledStock = data.stock;
-      const discardPileTop = shuffledStock.at(-1)!;
-      return {
-        stock: shuffledStock.slice(0, -1 - INIT_CARDS_COUNT_PER_PLAYER * 4),
-        discardPile: [discardPileTop],
-        isCardEffectOn:
-          discardPileTop.rank === "A" || discardPileTop.rank === "7",
-        activeSuit: discardPileTop.suit,
-        nextStockDrawCount: getNextStockDrawCount(
-          discardPileTop.rank === "A" || discardPileTop.rank === "7",
-          discardPileTop,
-          1
-        ),
-      };
-    }
-    case "SKIP_TURN":
-      return {
-        ...state,
-        stock: data.stock,
-        discardPile: data.discardPile,
-        isCardEffectOn: false,
-        nextStockDrawCount: 1,
-      };
-
-    case "DRAW":
-      return {
-        ...state,
-        stock: data.stock,
-        discardPile: data.discardPile,
-        isCardEffectOn: false,
-        nextStockDrawCount: 1,
-      };
-    case "PLAY":
-      return {
-        ...state,
-        discardPile: [...state.discardPile, data.selectedCard],
-        isCardEffectOn:
-          data.selectedCard.rank === "7" || data.selectedCard.rank === "A",
-        activeSuit: data.newSuit || data.selectedCard.suit,
-        nextStockDrawCount: getNextStockDrawCount(
-          data.selectedCard.rank === "7" || data.selectedCard.rank === "A",
-          data.selectedCard,
-          state.nextStockDrawCount
-        ),
-      };
-    default:
-      return state;
-  }
-};
-
-type PlayerState = { players: PlayerType[]; currentPlayerId: string };
-
-const playersInitialState: PlayerState = {
-  players: [],
-  currentPlayerId: "",
-};
-
-type PlayerReducerAction =
-  | {
-      type: "INIT";
-      data: {
-        cards: CardType[];
-      };
-    }
-  | {
-      type: "DRAW";
-      data: {
-        cards: CardType[];
-      };
-    }
-  | {
-      type: "PLAY";
-      data: {
-        selectedCard: CardType;
-      };
-    };
-
-const playerReducer = (
-  { players, currentPlayerId }: PlayerState,
-  { type, data }: PlayerReducerAction
-): PlayerState => {
-  switch (type) {
-    case "INIT": {
-      const fstPlayerId = uuidv4();
-      return {
-        players: [
-          {
-            id: fstPlayerId,
-            isReal: false,
-            cards: data.cards.slice(0, INIT_CARDS_COUNT_PER_PLAYER),
-            position: "left",
-          },
-          {
-            id: uuidv4(),
-            isReal: false,
-            cards: data.cards.slice(
-              INIT_CARDS_COUNT_PER_PLAYER,
-              2 * INIT_CARDS_COUNT_PER_PLAYER
-            ),
-            position: "top",
-          },
-          {
-            id: uuidv4(),
-            isReal: false,
-            cards: data.cards.slice(
-              2 * INIT_CARDS_COUNT_PER_PLAYER,
-              3 * INIT_CARDS_COUNT_PER_PLAYER
-            ),
-            position: "right",
-          },
-          {
-            id: uuidv4(),
-            isReal: true,
-            cards: data.cards.slice(
-              3 * INIT_CARDS_COUNT_PER_PLAYER,
-              4 * INIT_CARDS_COUNT_PER_PLAYER
-            ),
-            position: "bottom",
-          },
-        ],
-        currentPlayerId: fstPlayerId,
-      };
-    }
-    case "DRAW":
-      return {
-        players: players.map((p) => {
-          if (p.id === currentPlayerId) {
-            return { ...p, cards: [...p.cards, ...data.cards] };
-          }
-          return p;
-        }),
-        currentPlayerId: getNextPlayerId(players, currentPlayerId),
-      };
-    case "PLAY":
-      return {
-        players: players
-          .map((p) => {
-            if (p.id === currentPlayerId) {
-              return {
-                ...p,
-                cards: p.cards.filter(
-                  (card) =>
-                    !getImageSrc(data.selectedCard).includes(getImageSrc(card))
-                ),
-              };
-            }
-            return p;
-          })
-          .filter((p) => p.cards.length !== 0),
-        currentPlayerId: getNextPlayerId(players, currentPlayerId),
-      };
-    default:
-      return { players, currentPlayerId };
-  }
-};
+export const INIT_CARDS_COUNT_PER_PLAYER = 4;
 
 export const Game = (props: {}) => {
-  //   const [players, setPlayers] = useState<PlayerType[]>([]);
-  //   const [currentPlayerId, setCurrentPlayerId] = useState("");
   const [activeSuit, setActiveSuit] = useState(SUITS[0]);
   const [beginRound, setBeginRound] = useState(true);
   const [renderFinishModal, setRenderFinishModal] = useState(false);
@@ -288,7 +87,7 @@ export const Game = (props: {}) => {
     }
     let newStock = board.stock;
     let newDiscardPile = board.discardPile;
-    let drawnCards : CardType[] = [];
+    let drawnCards: CardType[] = [];
     if (board.nextStockDrawCount !== 0) {
       const [stock, discardPile, cards] = drawCards(
         board.stock,
@@ -299,7 +98,7 @@ export const Game = (props: {}) => {
       newDiscardPile = discardPile;
       drawnCards = cards;
     }
-    playersDispatch({type: "DRAW", data: {cards: drawnCards}})
+    playersDispatch({ type: "DRAW", data: { cards: drawnCards } });
     boardDispatch({
       type: "SKIP_TURN",
       data: { stock: newStock, discardPile: newDiscardPile },
@@ -488,92 +287,3 @@ export const Game = (props: {}) => {
     </>
   );
 };
-
-function drawCards(
-  stock: CardType[],
-  discardPile: CardType[],
-  drawCount: number
-) {
-  if (drawCount <= 0) return [stock, discardPile, []];
-  if (stock.length > drawCount) {
-    return [stock.slice(0, -drawCount), discardPile, stock.slice(-drawCount)];
-  }
-  if (stock.length === drawCount) {
-    return [
-      discardPile.slice(0, -1).reverse(),
-      discardPile.slice(-1),
-      stock.slice(-drawCount),
-    ];
-  }
-  const newStock = discardPile.slice(0, -1).reverse();
-  const newDiscardPile = discardPile.slice(-1);
-  const drawnCards = [
-    ...stock.slice(),
-    ...newStock.slice(-(drawCount - stock.length)),
-  ];
-  const stockAfterDrawing = newStock.slice(0, -(drawCount - stock.length));
-  return [stockAfterDrawing, newDiscardPile, drawnCards];
-}
-
-function canBePlayedOn(
-  card: CardType,
-  discardPile: CardType[],
-  activeSuit: Suit,
-  isCardEffectOn: boolean
-) {
-  if (!isCardEffectOn) {
-    return (
-      card.suit === activeSuit ||
-      card.rank === discardPile.at(-1)?.rank ||
-      card.rank === "Q"
-    );
-  }
-  if (discardPile.at(-1)?.rank === "A") {
-    return card.rank === "A";
-  }
-  if (discardPile.at(-1)?.rank === "7") {
-    return card.rank === "7";
-  }
-  return false;
-}
-
-function getNextStockDrawCount(
-  isCardEffectOn: boolean,
-  discardPileTop: CardType,
-  nextStockDrawCount: number
-) {
-  if (!isCardEffectOn) {
-    return 1;
-  }
-  if (discardPileTop.rank === "A") {
-    return 0;
-  }
-  if (discardPileTop.rank === "7") {
-    return nextStockDrawCount + (nextStockDrawCount % 2 === 0 ? 2 : 1);
-  }
-  return 1;
-}
-
-function getCurrentPlayer(
-  players: PlayerType[],
-  currentPlayerId: string,
-  beginRound: boolean
-): PlayerType {
-  const player = players.find((p) => p.id === currentPlayerId);
-  if (player === undefined) {
-    if (!beginRound) {
-      throw Error("Player with current player id isn't found");
-    }
-    return { id: "", isReal: false, cards: [], position: "left" };
-  }
-  return player;
-}
-
-function getNextPlayerId(players: PlayerType[], currentPlayerId: string) {
-  const index = players.findIndex((p) => p.id === currentPlayerId);
-  return players[(index + 1) % players.length].id;
-}
-
-function getPlayerCards(players: PlayerType[], position: Position) {
-  return players.find((p) => p.position === position)?.cards ?? [];
-}
