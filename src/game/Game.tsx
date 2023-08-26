@@ -106,15 +106,125 @@ const boardReducer = (
   }
 };
 
+type PlayerState = { players: PlayerType[]; currentPlayerId: string };
+
+const playersInitialState: PlayerState = {
+  players: [],
+  currentPlayerId: "",
+};
+
+type PlayerReducerAction =
+  | {
+      type: "INIT";
+      data: {
+        cards: CardType[];
+      };
+    }
+  | {
+      type: "DRAW";
+      data: {
+        cards: CardType[];
+      };
+    }
+  | {
+      type: "PLAY";
+      data: {
+        selectedCard: CardType;
+      };
+    };
+
+const playerReducer = (
+  { players, currentPlayerId }: PlayerState,
+  { type, data }: PlayerReducerAction
+): PlayerState => {
+  switch (type) {
+    case "INIT": {
+      const fstPlayerId = uuidv4();
+      return {
+        players: [
+          {
+            id: fstPlayerId,
+            isReal: false,
+            cards: data.cards.slice(0, INIT_CARDS_COUNT_PER_PLAYER),
+            position: "left",
+          },
+          {
+            id: uuidv4(),
+            isReal: false,
+            cards: data.cards.slice(
+              INIT_CARDS_COUNT_PER_PLAYER,
+              2 * INIT_CARDS_COUNT_PER_PLAYER
+            ),
+            position: "top",
+          },
+          {
+            id: uuidv4(),
+            isReal: false,
+            cards: data.cards.slice(
+              2 * INIT_CARDS_COUNT_PER_PLAYER,
+              3 * INIT_CARDS_COUNT_PER_PLAYER
+            ),
+            position: "right",
+          },
+          {
+            id: uuidv4(),
+            isReal: true,
+            cards: data.cards.slice(
+              3 * INIT_CARDS_COUNT_PER_PLAYER,
+              4 * INIT_CARDS_COUNT_PER_PLAYER
+            ),
+            position: "bottom",
+          },
+        ],
+        currentPlayerId: fstPlayerId,
+      };
+    }
+    case "DRAW":
+      return {
+        players: players.map((p) => {
+          if (p.id === currentPlayerId) {
+            return { ...p, cards: [...p.cards, ...data.cards] };
+          }
+          return p;
+        }),
+        currentPlayerId: getNextPlayerId(players, currentPlayerId),
+      };
+    case "PLAY":
+      return {
+        players: players
+          .map((p) => {
+            if (p.id === currentPlayerId) {
+              return {
+                ...p,
+                cards: p.cards.filter(
+                  (card) =>
+                    !getImageSrc(data.selectedCard).includes(getImageSrc(card))
+                ),
+              };
+            }
+            return p;
+          })
+          .filter((p) => p.cards.length !== 0),
+        currentPlayerId: getNextPlayerId(players, currentPlayerId),
+      };
+    default:
+      return { players, currentPlayerId };
+  }
+};
+
 export const Game = (props: {}) => {
-  const [players, setPlayers] = useState<PlayerType[]>([]);
-  const [currentPlayerId, setCurrentPlayerId] = useState("");
+  //   const [players, setPlayers] = useState<PlayerType[]>([]);
+  //   const [currentPlayerId, setCurrentPlayerId] = useState("");
   const [activeSuit, setActiveSuit] = useState(SUITS[0]);
   const [beginRound, setBeginRound] = useState(true);
   const [renderFinishModal, setRenderFinishModal] = useState(false);
   const [renderSuitChoiceModal, setRenderSuitChoiceModal] = useState(false);
 
-  const [board, dispatchBoard] = useReducer(boardReducer, boardInitialState);
+  const [board, boardDispatch] = useReducer(boardReducer, boardInitialState);
+  const [{ players, currentPlayerId }, playersDispatch] = useReducer(
+    playerReducer,
+    playersInitialState
+  );
 
   useEffect(() => {
     if (!beginRound) {
@@ -124,49 +234,13 @@ export const Game = (props: {}) => {
       .map((card) => ({ card, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ card }) => card);
-    dispatchBoard({ type: "INIT", data: { stock: shuffledStock } });
+    boardDispatch({ type: "INIT", data: { stock: shuffledStock } });
 
     const playersCards = shuffledStock.slice(
       -INIT_CARDS_COUNT_PER_PLAYER * 4 - 1,
       -1
     );
-    const fstPlayerId = uuidv4();
-    setPlayers([
-      {
-        id: fstPlayerId,
-        isReal: false,
-        cards: playersCards.slice(0, INIT_CARDS_COUNT_PER_PLAYER),
-        position: "left",
-      },
-      {
-        id: uuidv4(),
-        isReal: false,
-        cards: playersCards.slice(
-          INIT_CARDS_COUNT_PER_PLAYER,
-          2 * INIT_CARDS_COUNT_PER_PLAYER
-        ),
-        position: "top",
-      },
-      {
-        id: uuidv4(),
-        isReal: false,
-        cards: playersCards.slice(
-          2 * INIT_CARDS_COUNT_PER_PLAYER,
-          3 * INIT_CARDS_COUNT_PER_PLAYER
-        ),
-        position: "right",
-      },
-      {
-        id: uuidv4(),
-        isReal: true,
-        cards: playersCards.slice(
-          3 * INIT_CARDS_COUNT_PER_PLAYER,
-          4 * INIT_CARDS_COUNT_PER_PLAYER
-        ),
-        position: "bottom",
-      },
-    ]);
-    setCurrentPlayerId(fstPlayerId);
+    playersDispatch({ type: "INIT", data: { cards: playersCards } });
 
     setBeginRound(false);
     setRenderFinishModal(false);
@@ -214,25 +288,19 @@ export const Game = (props: {}) => {
     }
     let newStock = board.stock;
     let newDiscardPile = board.discardPile;
+    let drawnCards : CardType[] = [];
     if (board.nextStockDrawCount !== 0) {
-      const [stock, discardPile, drawnCards] = drawCards(
+      const [stock, discardPile, cards] = drawCards(
         board.stock,
         board.discardPile,
         board.nextStockDrawCount
       );
       newStock = stock;
       newDiscardPile = discardPile;
-      setPlayers(
-        players.map((p) => {
-          if (p.id === currentPlayerId) {
-            p.cards = [...p.cards, ...drawnCards];
-          }
-          return p;
-        })
-      );
+      drawnCards = cards;
     }
-    setCurrentPlayerId(getNextPlayerId(players, currentPlayerId));
-    dispatchBoard({
+    playersDispatch({type: "DRAW", data: {cards: drawnCards}})
+    boardDispatch({
       type: "SKIP_TURN",
       data: { stock: newStock, discardPile: newDiscardPile },
     });
@@ -244,16 +312,8 @@ export const Game = (props: {}) => {
       board.discardPile,
       board.nextStockDrawCount
     );
-    setPlayers(
-      players.map((p) => {
-        if (p.id === currentPlayerId) {
-          return { ...p, cards: [...p.cards, ...drawnCards] };
-        }
-        return p;
-      })
-    );
-    setCurrentPlayerId(getNextPlayerId(players, currentPlayerId));
-    dispatchBoard({
+    playersDispatch({ type: "DRAW", data: { cards: drawnCards } });
+    boardDispatch({
       type: "DRAW",
       data: { stock, discardPile },
     });
@@ -270,24 +330,9 @@ export const Game = (props: {}) => {
     ) {
       return false;
     }
-    setPlayers(
-      players
-        .map((p) => {
-          if (p.id === currentPlayerId) {
-            return {
-              ...p,
-              cards: p.cards.filter(
-                (card) => !getImageSrc(selectedCard).includes(getImageSrc(card))
-              ),
-            };
-          }
-          return p;
-        })
-        .filter((p) => p.cards.length !== 0)
-    );
-    setCurrentPlayerId(getNextPlayerId(players, currentPlayerId));
+    playersDispatch({ type: "PLAY", data: { selectedCard } });
 
-    dispatchBoard({ type: "PLAY", data: { selectedCard: selectedCard } });
+    boardDispatch({ type: "PLAY", data: { selectedCard } });
     setRenderFinishModal(
       getCurrentPlayer(players, currentPlayerId, beginRound).cards.length === 1
     );
@@ -331,17 +376,9 @@ export const Game = (props: {}) => {
       board.discardPile,
       board.nextStockDrawCount
     );
-    setPlayers(
-      players.map((p) => {
-        if (p.id === currentPlayerId) {
-          return { ...p, cards: [...p.cards, ...drawnCards] };
-        }
-        return p;
-      })
-    );
-    setCurrentPlayerId(getNextPlayerId(players, currentPlayerId));
 
-    dispatchBoard({ type: "DRAW", data: { stock, discardPile } });
+    playersDispatch({ type: "DRAW", data: { cards: drawnCards } });
+    boardDispatch({ type: "DRAW", data: { stock, discardPile } });
   }
 
   function tryPlayCardArtificialPlayer() {
@@ -360,27 +397,12 @@ export const Game = (props: {}) => {
     if (foundCard === undefined) {
       return false;
     }
-    setCurrentPlayerId(getNextPlayerId(players, currentPlayerId));
-    setPlayers(
-      players
-        .map((p) => {
-          if (p.id === currentPlayerId) {
-            return {
-              ...p,
-              cards: p.cards.filter(
-                (c) => !getImageSrc(foundCard).includes(getImageSrc(c))
-              ),
-            };
-          }
-          return p;
-        })
-        .filter((p) => p.cards.length !== 0)
-    );
+    playersDispatch({ type: "PLAY", data: { selectedCard: foundCard } });
     const newSuit =
       foundCard.rank === "Q"
         ? SUITS[Math.floor(Math.random() * 100) % 4]
         : foundCard.suit;
-    dispatchBoard({ type: "PLAY", data: { selectedCard: foundCard, newSuit } });
+    boardDispatch({ type: "PLAY", data: { selectedCard: foundCard, newSuit } });
     setRenderFinishModal(
       players.length === 2 &&
         getCurrentPlayer(players, currentPlayerId, beginRound).cards.length ===
