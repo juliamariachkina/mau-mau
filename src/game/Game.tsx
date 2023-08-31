@@ -14,7 +14,6 @@ const PLAYER_TURN_TIMEOUT = 1200;
 export const INIT_CARDS_COUNT_PER_PLAYER = 4;
 
 export const Game = (props: {}) => {
-  const [activeSuit, setActiveSuit] = useState(SUITS[0]);
   const [beginRound, setBeginRound] = useState(true);
   const [renderFinishModal, setRenderFinishModal] = useState(false);
   const [renderSuitChoiceModal, setRenderSuitChoiceModal] = useState(false);
@@ -66,18 +65,7 @@ export const Game = (props: {}) => {
   };
 
   const handleSuitChoice = (target: HTMLImageElement) => {
-    if (target.src.includes("club")) {
-      setActiveSuit("club");
-    }
-    if (target.src.includes("diamond")) {
-      setActiveSuit("diamond");
-    }
-    if (target.src.includes("spade")) {
-      setActiveSuit("spade");
-    }
-    if (target.src.includes("heart")) {
-      setActiveSuit("heart");
-    }
+    boardDispatch({type: "SUIT_CHOICE", data: {imageSrc: target.src}});
     setRenderSuitChoiceModal(false);
   };
 

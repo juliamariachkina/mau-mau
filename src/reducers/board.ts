@@ -38,7 +38,8 @@ type BoardReducerAction =
         selectedCard: CardType;
         newSuit?: Suit;
       };
-    };
+    }
+  | { type: "SUIT_CHOICE"; data: { imageSrc: string } };
 
 export const boardReducer = (
   state: Board,
@@ -91,7 +92,25 @@ export const boardReducer = (
           state.nextStockDrawCount
         ),
       };
+    case "SUIT_CHOICE":
+      return {...state, activeSuit: getSuit(data.imageSrc)};
     default:
       return state;
   }
+};
+
+const getSuit = (imageSrc: string) => {
+  if (imageSrc.includes("club")) {
+    return "club";
+  }
+  if (imageSrc.includes("diamond")) {
+    return "diamond";
+  }
+  if (imageSrc.includes("spade")) {
+    return "spade";
+  }
+  if (imageSrc.includes("heart")) {
+    return "heart";
+  }
+  throw Error("Incorrect image");
 };
