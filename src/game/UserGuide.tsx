@@ -2,11 +2,11 @@ import { Suit } from "../types/card";
 import { getSuitImage } from "../utility/Utility";
 import { Player } from "../types/player";
 
-export function UserGuide(props: {
+export function UserGuide(props: Readonly<{
   activeSuit: Suit;
   activePlayer: Player;
   nextDrawCount: number;
-}) {
+}>) {
   const activePlayerStr = props.activePlayer.isReal
     ? "you"
     : props.activePlayer.position;

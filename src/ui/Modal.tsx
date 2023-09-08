@@ -1,12 +1,12 @@
 import { Suit } from "../types/card";
 import { getSuitImage } from "../utility/Utility";
 
-export function Modal(props: {
+export function Modal(props: Readonly<{
   modalContentClass: string;
   closeBtnClass: string;
   text: string;
   onClick: () => void;
-}) {
+}>) {
   return (
     <div className="modal" onClick={props.onClick}>
       <div
@@ -22,9 +22,9 @@ export function Modal(props: {
   );
 }
 
-export function SuitChoiceModal(props: {
+export function SuitChoiceModal(props: Readonly<{
   onSuitImageClick: (target: HTMLImageElement) => void;
-}) {
+}>) {
   return (
     <div className="modal">
       <div className="modal__content">

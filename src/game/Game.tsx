@@ -3,7 +3,7 @@ import { Player } from "./Player";
 import { PlayState } from "./PlayState";
 import { Button } from "../ui/Button";
 import { MouseEventHandler, useEffect, useState, useReducer } from "react";
-import { Card as CardType, deck, SUITS } from "../types/card";
+import { Card as CardType, readonlyDeck as deck, SUITS } from "../types/card";
 import { getImageSrc } from "../utility/Utility";
 import { SuitChoiceModal } from "../ui/Modal";
 import { playerReducer, playersInitialState } from "../reducers/player";
@@ -19,10 +19,10 @@ import { GameResult } from "../types/game-result";
 const PLAYER_TURN_TIMEOUT = 1200;
 export const INIT_CARDS_COUNT_PER_PLAYER = 4;
 
-export const Game = (props: {
+export const Game = (props: Readonly<{
   onGameFinish: (result: GameResult) => void;
   isNewRound: boolean;
-}) => {
+}>) => {
   const [renderSuitChoiceModal, setRenderSuitChoiceModal] = useState(false);
   const [board, boardDispatch] = useReducer(boardReducer, boardInitialState);
   const [{ players, currentPlayerId }, playersDispatch] = useReducer(
@@ -85,7 +85,7 @@ export const Game = (props: {
     }
     let newStock = board.stock;
     let newDiscardPile = board.discardPile;
-    let drawnCards: CardType[] = [];
+    let drawnCards: ReadonlyArray<CardType> = [];
     if (board.nextStockDrawCount !== 0) {
       const [stock, discardPile, cards] = drawCards(
         board.stock,

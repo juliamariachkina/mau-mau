@@ -14,32 +14,32 @@ export const boardInitialState: Board = {
 type BoardReducerAction =
   | {
       type: "INIT";
-      data: {
-        stock: CardType[];
-      };
+      data: Readonly<{
+        stock: ReadonlyArray<CardType>;
+      }>;
     }
   | {
       type: "SKIP_TURN";
-      data: {
-        stock: CardType[];
-        discardPile: CardType[];
-      };
+      data: Readonly<{
+        stock: ReadonlyArray<CardType>;
+        discardPile: ReadonlyArray<CardType>;
+      }>;
     }
   | {
       type: "DRAW";
-      data: {
-        stock: CardType[];
-        discardPile: CardType[];
-      };
+      data: Readonly<{
+        stock: ReadonlyArray<CardType>;
+        discardPile: ReadonlyArray<CardType>;
+      }>;
     }
   | {
       type: "PLAY";
-      data: {
+      data: Readonly<{
         selectedCard: CardType;
         newSuit?: Suit;
-      };
+      }>;
     }
-  | { type: "SUIT_CHOICE"; data: { imageSrc: string } };
+  | { type: "SUIT_CHOICE"; data: Readonly<{ imageSrc: string }> };
 
 export const boardReducer = (
   state: Board,

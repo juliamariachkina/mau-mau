@@ -1,11 +1,11 @@
-import { Player as PlayerType, Position } from "../types/player";
-import { Card as CardType, deck, Suit, SUITS } from "../types/card";
+import { Player as PlayerType } from "../types/player";
+import { Card as CardType} from "../types/card";
 import { getImageSrc } from "../utility/Utility";
 import { v4 as uuidv4 } from "uuid";
 import { getNextPlayerId } from "../utility/GameUtility";
 import { INIT_CARDS_COUNT_PER_PLAYER } from "../game/Game";
 
-type PlayerState = { players: PlayerType[]; currentPlayerId: string };
+type PlayerState = Readonly<{ players: ReadonlyArray<PlayerType>; currentPlayerId: string }>;
 
 export const playersInitialState: PlayerState = {
   players: [],
@@ -15,21 +15,21 @@ export const playersInitialState: PlayerState = {
 type PlayerReducerAction =
   | {
       type: "INIT";
-      data: {
-        cards: CardType[];
-      };
+      data: Readonly<{
+        cards: ReadonlyArray<CardType>;
+      }>;
     }
   | {
       type: "DRAW";
-      data: {
-        cards: CardType[];
-      };
+      data: Readonly<{
+        cards: ReadonlyArray<CardType>;
+      }>;
     }
   | {
       type: "PLAY";
-      data: {
+      data: Readonly<{
         selectedCard: CardType;
-      };
+      }>;
     };
 
 export const playerReducer = (

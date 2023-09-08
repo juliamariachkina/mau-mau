@@ -3,7 +3,7 @@ import { GameResult } from "../types/game-result";
 import { Game } from "./Game";
 import { useEffect, useState } from "react";
 
-export function App(props: {}) {
+export function App() {
   const [beginRound, setBeginRound] = useState(true);
   const [renderFinishModal, setRenderFinishModal] = useState(false);
 

@@ -2,8 +2,8 @@ import { Card as CardType, Suit } from "../types/card";
 import { Player as PlayerType, Position } from "../types/player";
 
 export const drawCards = (
-  stock: CardType[],
-  discardPile: CardType[],
+  stock: ReadonlyArray<CardType>,
+  discardPile: ReadonlyArray<CardType>,
   drawCount: number
 ) => {
   if (drawCount <= 0) return [stock, discardPile, []];
@@ -29,7 +29,7 @@ export const drawCards = (
 
 export const canBePlayedOn = (
   card: CardType,
-  discardPile: CardType[],
+  discardPile: ReadonlyArray<CardType>,
   activeSuit: Suit,
   isCardEffectOn: boolean
 ) => {
@@ -67,7 +67,7 @@ export const getNextStockDrawCount = (
 }
 
 export const getCurrentPlayer = (
-  players: PlayerType[],
+  players: ReadonlyArray<PlayerType>,
   currentPlayerId: string,
   beginRound: boolean
 ): PlayerType => {
@@ -81,11 +81,17 @@ export const getCurrentPlayer = (
   return player;
 }
 
-export const getNextPlayerId = (players: PlayerType[], currentPlayerId: string) => {
+export const getNextPlayerId = (
+  players: ReadonlyArray<PlayerType>,
+  currentPlayerId: string
+) => {
   const index = players.findIndex((p) => p.id === currentPlayerId);
   return players[(index + 1) % players.length].id;
-}
+};
 
-export const getPlayerCards = (players: PlayerType[], position: Position) => {
+export const getPlayerCards = (
+  players: ReadonlyArray<PlayerType>,
+  position: Position
+) => {
   return players.find((p) => p.position === position)?.cards ?? [];
-}
+};

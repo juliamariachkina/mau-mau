@@ -6,12 +6,12 @@ import { getImageSrc } from "../utility/Utility";
 import cardBack from "../images/card-back.png";
 import cardBackRotated from "../images/card-back-rotated.png";
 
-export function Player(props: {
+export function Player(props: Readonly<{
   isReal: boolean;
   position: string;
-  cards: CardType[];
+  cards: ReadonlyArray<CardType>;
   onCardClick: MouseEventHandler<HTMLImageElement>;
-}) {
+}>) {
   const className = props.isReal
     ? "real-player"
     : "artificial-player-" + props.position;

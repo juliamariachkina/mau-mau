@@ -5,13 +5,13 @@ import { Player } from "../types/player";
 import { getImageSrc } from "../utility/Utility";
 import { MouseEventHandler } from "react";
 
-export function PlayState(props: {
+export function PlayState(props: Readonly<{
   discardPileTopSrc: string;
   onStockClick: MouseEventHandler<HTMLImageElement>;
   activeSuit: Suit;
   activePlayer: Player;
   nextDrawCount: number;
-}) {
+}>) {
   return (
     <div className="play-state">
       <div className="play-state-cards">
@@ -35,11 +35,11 @@ export function PlayState(props: {
   );
 }
 
-export function PlayStateCard(props: {
+export function PlayStateCard(props: Readonly<{
   src: string;
   className: string;
   onClick: MouseEventHandler<HTMLImageElement>;
-}) {
+}>) {
   return (
     <img
       className={"card " + props.className}

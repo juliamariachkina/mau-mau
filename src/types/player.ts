@@ -2,9 +2,9 @@ import { Card } from "./card";
 
 export type Position = "top" | "right" | "left" | "bottom";
 
-export interface Player {
+export type Player = Readonly<{
     id: string,
     isReal: boolean,
-    cards: Card[],
+    cards: ReadonlyArray<Card>,
     position: Position,
-}
+}>
