@@ -1,0 +1,1 @@
+export type GameResult = "USER_WON" | "USER_FINISHED" | "USER_LOST";

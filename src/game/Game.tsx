@@ -3,21 +3,27 @@ import { Player } from "./Player";
 import { PlayState } from "./PlayState";
 import { Button } from "../ui/Button";
 import { MouseEventHandler, useEffect, useState, useReducer } from "react";
-import { Card as CardType, deck, Suit, SUITS } from "../types/card";
+import { Card as CardType, deck, SUITS } from "../types/card";
 import { getImageSrc } from "../utility/Utility";
-import { Modal, SuitChoiceModal } from "../ui/Modal";
+import { SuitChoiceModal } from "../ui/Modal";
 import { playerReducer, playersInitialState } from "../reducers/player";
-import { canBePlayedOn, drawCards, getCurrentPlayer, getPlayerCards } from "../utility/GameUtility";
+import {
+  canBePlayedOn,
+  drawCards,
+  getCurrentPlayer,
+  getPlayerCards,
+} from "../utility/GameUtility";
 import { boardInitialState, boardReducer } from "../reducers/board";
+import { GameResult } from "../types/game-result";
 
 const PLAYER_TURN_TIMEOUT = 1200;
 export const INIT_CARDS_COUNT_PER_PLAYER = 4;
 
-export const Game = (props: {}) => {
-  const [beginRound, setBeginRound] = useState(true);
-  const [renderFinishModal, setRenderFinishModal] = useState(false);
+export const Game = (props: {
+  onGameFinish: (result: GameResult) => void;
+  isNewRound: boolean;
+}) => {
   const [renderSuitChoiceModal, setRenderSuitChoiceModal] = useState(false);
-
   const [board, boardDispatch] = useReducer(boardReducer, boardInitialState);
   const [{ players, currentPlayerId }, playersDispatch] = useReducer(
     playerReducer,
@@ -25,7 +31,7 @@ export const Game = (props: {}) => {
   );
 
   useEffect(() => {
-    if (!beginRound) {
+    if (!props.isNewRound) {
       return;
     }
     const shuffledStock = deck
@@ -39,38 +45,42 @@ export const Game = (props: {}) => {
       -1
     );
     playersDispatch({ type: "INIT", data: { cards: playersCards } });
-
-    setBeginRound(false);
-    setRenderFinishModal(false);
     setRenderSuitChoiceModal(false);
-  });
+  }, [props.isNewRound]);
 
   useEffect(() => {
     if (
       currentPlayerId !== "" &&
-      !getCurrentPlayer(players, currentPlayerId, beginRound).isReal &&
-      !renderFinishModal &&
+      !getCurrentPlayer(players, currentPlayerId, props.isNewRound).isReal &&
       !renderSuitChoiceModal
     ) {
       setTimeout(makeTurnArtificialPlayer, PLAYER_TURN_TIMEOUT);
     }
-  }, [currentPlayerId, renderFinishModal, renderSuitChoiceModal]);
+  }, [currentPlayerId, renderSuitChoiceModal]);
+
+  useEffect(() => {
+    if (players.length === 3 && !players.find((p) => p.isReal)) {
+      props.onGameFinish("USER_WON");
+    }
+    if (players.length === 1 && players[0].isReal) {
+      props.onGameFinish("USER_LOST");
+    }
+    if (!players.find((p) => p.isReal)) {
+      props.onGameFinish("USER_FINISHED");
+    }
+  }, [players.length]);
 
   const handleCardClick: MouseEventHandler<HTMLImageElement> = (e) => {
     makeTurnRealPlayer(e.target);
   };
 
-  const handleModalClose = () => {
-    setBeginRound(true);
-  };
-
   const handleSuitChoice = (target: HTMLImageElement) => {
-    boardDispatch({type: "SUIT_CHOICE", data: {imageSrc: target.src}});
+    boardDispatch({ type: "SUIT_CHOICE", data: { imageSrc: target.src } });
     setRenderSuitChoiceModal(false);
   };
 
   const handleSkipTurnClick = () => {
-    if (!getCurrentPlayer(players, currentPlayerId, beginRound).isReal) {
+    if (!getCurrentPlayer(players, currentPlayerId, props.isNewRound).isReal) {
       return;
     }
     let newStock = board.stock;
@@ -120,15 +130,12 @@ export const Game = (props: {}) => {
     playersDispatch({ type: "PLAY", data: { selectedCard } });
 
     boardDispatch({ type: "PLAY", data: { selectedCard } });
-    setRenderFinishModal(
-      getCurrentPlayer(players, currentPlayerId, beginRound).cards.length === 1
-    );
     setRenderSuitChoiceModal(selectedCard.rank === "Q");
     return true;
   }
 
   function makeTurnRealPlayer(target: EventTarget) {
-    if (!getCurrentPlayer(players, currentPlayerId, beginRound).isReal) {
+    if (!getCurrentPlayer(players, currentPlayerId, props.isNewRound).isReal) {
       return;
     }
     if (target === document.querySelector(".stock")) {
@@ -138,7 +145,7 @@ export const Game = (props: {}) => {
     const clickedOnCard = getCurrentPlayer(
       players,
       currentPlayerId,
-      beginRound
+      props.isNewRound
     ).cards.find((card) =>
       (target as HTMLImageElement)
         .getAttribute("src")
@@ -172,7 +179,7 @@ export const Game = (props: {}) => {
     const foundCard = getCurrentPlayer(
       players,
       currentPlayerId,
-      beginRound
+      props.isNewRound
     ).cards.find((card) =>
       canBePlayedOn(
         card,
@@ -190,11 +197,6 @@ export const Game = (props: {}) => {
         ? SUITS[Math.floor(Math.random() * 100) % 4]
         : foundCard.suit;
     boardDispatch({ type: "PLAY", data: { selectedCard: foundCard, newSuit } });
-    setRenderFinishModal(
-      players.length === 2 &&
-        getCurrentPlayer(players, currentPlayerId, beginRound).cards.length ===
-          1
-    );
     return true;
   }
 
@@ -202,24 +204,6 @@ export const Game = (props: {}) => {
     (["top", "left", "right", "bottom"] as const).map((position) =>
       getPlayerCards(players, position)
     );
-
-  let modalContentClass = "modal__content modal__content--finish";
-  let closeBtnClass = "close-btn close-btn--finish";
-  let text = "You finished";
-  if (
-    players.length === 3 &&
-    !players.find((p) => p.isReal) &&
-    renderFinishModal
-  ) {
-    modalContentClass = "modal__content modal__content--win";
-    closeBtnClass = "close-btn close-btn--win";
-    text = "You won!";
-  }
-  if (players.length === 1 && players[0].isReal && renderFinishModal) {
-    modalContentClass = "modal__content modal__content--loss";
-    closeBtnClass = "close-btn close-btn--loss";
-    text = "It does not matter how slowly you go, as long as you don’t stop";
-  }
 
   return (
     <>
@@ -242,7 +226,11 @@ export const Game = (props: {}) => {
           discardPileTopSrc={getImageSrc(board.discardPile.at(-1))}
           onStockClick={handleCardClick}
           activeSuit={board.activeSuit}
-          activePlayer={getCurrentPlayer(players, currentPlayerId, beginRound)}
+          activePlayer={getCurrentPlayer(
+            players,
+            currentPlayerId,
+            props.isNewRound
+          )}
           nextDrawCount={board.nextStockDrawCount}
         />
         <Player
@@ -261,14 +249,6 @@ export const Game = (props: {}) => {
           onCardClick={handleCardClick}
         />
       </PlayBoardArea>
-      {renderFinishModal && (
-        <Modal
-          modalContentClass={modalContentClass}
-          closeBtnClass={closeBtnClass}
-          text={text}
-          onClick={handleModalClose}
-        />
-      )}
       {renderSuitChoiceModal && (
         <SuitChoiceModal onSuitImageClick={handleSuitChoice} />
       )}
