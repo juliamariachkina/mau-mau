@@ -34,6 +34,7 @@ export function SuitChoiceModal(props: Readonly<{
             <img
               className="modal__content__suit-img"
               src={getSuitImage(suit)}
+              alt={suit}
               onClick={(e) =>
                 props.onSuitImageClick(e.target as HTMLImageElement)
               }

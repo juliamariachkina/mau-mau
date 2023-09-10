@@ -5,56 +5,62 @@ import { useEffect, useState } from "react";
 
 export function App() {
   const [beginRound, setBeginRound] = useState(true);
-  const [renderFinishModal, setRenderFinishModal] = useState(false);
+  const [renderFinishModal, setRenderFinishModal] = useState<{
+    modalContentClass: string;
+    closeBtnClass: string;
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     if (beginRound) {
       setBeginRound(false);
     }
-  }, [beginRound]);
-
-  let modalContentClass = "";
-  let closeBtnClass = "";
-  let text = "";
+  });
 
   const handleGameFinish = (result: GameResult) => {
     switch (result) {
       case "USER_WON": {
-        modalContentClass = "modal__content modal__content--win";
-        closeBtnClass = "close-btn close-btn--win";
-        text = "You won!";
+        setRenderFinishModal({
+          modalContentClass: "modal__content modal__content--win",
+          closeBtnClass: "close-btn close-btn--win",
+          text: "You won!",
+        });
         break;
       }
       case "USER_LOST": {
-        modalContentClass = "modal__content modal__content--loss";
-        closeBtnClass = "close-btn close-btn--loss";
-        text =
-          "It does not matter how slowly you go, as long as you don’t stop";
+        setRenderFinishModal({
+          modalContentClass: "modal__content modal__content--loss",
+          closeBtnClass: "close-btn close-btn--loss",
+          text: "It does not matter how slowly you go, as long as you don’t stop",
+        });
         break;
       }
       case "USER_FINISHED": {
-        modalContentClass = "modal__content modal__content--finish";
-        closeBtnClass = "close-btn close-btn--finish";
-        text = "You finished";
+        setRenderFinishModal({
+          modalContentClass: "modal__content modal__content--finish",
+          closeBtnClass: "close-btn close-btn--finish",
+          text: "You finished",
+        });
         break;
       }
     }
-    setRenderFinishModal(true);
   };
 
   const handleModalClose = () => {
     setBeginRound(true);
-    setRenderFinishModal(false);
+    setRenderFinishModal(null);
   };
 
   return (
     <>
-      <Game onGameFinish={handleGameFinish} isNewRound={beginRound} />
+      {!renderFinishModal && (
+        <Game onGameFinish={handleGameFinish} isNewRound={beginRound} />
+      )}
       {renderFinishModal && (
         <Modal
-          modalContentClass={modalContentClass}
-          closeBtnClass={closeBtnClass}
-          text={text}
+          modalContentClass={renderFinishModal.modalContentClass}
+          closeBtnClass={renderFinishModal.closeBtnClass}
+          text={renderFinishModal.text}
           onClick={handleModalClose}
         />
       )}

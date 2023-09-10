@@ -19,10 +19,12 @@ import { GameResult } from "../types/game-result";
 const PLAYER_TURN_TIMEOUT = 1200;
 export const INIT_CARDS_COUNT_PER_PLAYER = 4;
 
-export const Game = (props: Readonly<{
-  onGameFinish: (result: GameResult) => void;
-  isNewRound: boolean;
-}>) => {
+export const Game = (
+  props: Readonly<{
+    onGameFinish: (result: GameResult) => void;
+    isNewRound: boolean;
+  }>
+) => {
   const [renderSuitChoiceModal, setRenderSuitChoiceModal] = useState(false);
   const [board, boardDispatch] = useReducer(boardReducer, boardInitialState);
   const [{ players, currentPlayerId }, playersDispatch] = useReducer(
@@ -59,6 +61,10 @@ export const Game = (props: Readonly<{
   }, [currentPlayerId, renderSuitChoiceModal]);
 
   useEffect(() => {
+    if (players.length === 0 || players.length === 4) {
+      //Initial state
+      return;
+    }
     if (players.length === 3 && !players.find((p) => p.isReal)) {
       props.onGameFinish("USER_WON");
     }
@@ -75,7 +81,7 @@ export const Game = (props: Readonly<{
   };
 
   const handleSuitChoice = (target: HTMLImageElement) => {
-    boardDispatch({ type: "SUIT_CHOICE", data: { imageSrc: target.src } });
+    boardDispatch({ type: "SUIT_CHOICE", data: { imageSrc: target.alt } });
     setRenderSuitChoiceModal(false);
   };
 
@@ -128,9 +134,8 @@ export const Game = (props: Readonly<{
       return false;
     }
     playersDispatch({ type: "PLAY", data: { selectedCard } });
-
     boardDispatch({ type: "PLAY", data: { selectedCard } });
-    setRenderSuitChoiceModal(selectedCard.rank === "Q");
+    setRenderSuitChoiceModal(selectedCard.rank === "J");
     return true;
   }
 
@@ -193,7 +198,7 @@ export const Game = (props: Readonly<{
     }
     playersDispatch({ type: "PLAY", data: { selectedCard: foundCard } });
     const newSuit =
-      foundCard.rank === "Q"
+      foundCard.rank === "J"
         ? SUITS[Math.floor(Math.random() * 100) % 4]
         : foundCard.suit;
     boardDispatch({ type: "PLAY", data: { selectedCard: foundCard, newSuit } });

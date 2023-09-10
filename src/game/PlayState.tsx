@@ -1,4 +1,4 @@
-import cardBack from "../images/card-back.png";
+import cardBack from "../../images/card-back.png";
 import { UserGuide } from "./UserGuide";
 import { Card as CardType, Suit } from "../types/card";
 import { Player } from "../types/player";

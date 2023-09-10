@@ -37,7 +37,7 @@ export const canBePlayedOn = (
     return (
       card.suit === activeSuit ||
       card.rank === discardPile.at(-1)?.rank ||
-      card.rank === "Q"
+      card.rank === "J"
     );
   }
   if (discardPile.at(-1)?.rank === "A") {

@@ -3,8 +3,8 @@ import { Card } from "../ui/Card";
 import { Card as CardType } from "../types/card";
 import { getImageSrc } from "../utility/Utility";
 
-import cardBack from "../images/card-back.png";
-import cardBackRotated from "../images/card-back-rotated.png";
+import cardBack from "../../images/card-back.png";
+import cardBackRotated from "../../images/card-back-rotated.png";
 
 export function Player(props: Readonly<{
   isReal: boolean;
